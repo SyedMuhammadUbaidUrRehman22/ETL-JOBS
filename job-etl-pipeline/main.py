@@ -10,15 +10,17 @@ Current stage:
 - Validate records
 - Load jobs into SQLite
 - Log pipeline run
+- Export clean jobs to CSV
+- Generate reports
 - Print run summary
 
 Later stages:
-- Export CSV
-- Generate reports
 - Add more sources
+- Add CLI parameters
 """
 
 from __future__ import annotations
+from reports.generator import generate_reports
 
 import logging
 import logging.handlers
@@ -30,6 +32,7 @@ from pathlib import Path
 from etl.extract.base_scraper import ScraperConfig
 from etl.extract.remotive import RemotiveScraper
 from etl.load.db import check_db_ready, close_connection, get_connection, init_db
+from etl.load.exporter import export_jobs_to_csv
 from etl.load.loader import load_jobs, log_pipeline_run
 from etl.transform.cleaner import clean_job_record
 from etl.transform.deduper import add_fingerprints
@@ -153,6 +156,16 @@ def main() -> None:
             duration_secs=duration_secs,
         )
 
+        exported_rows = export_jobs_to_csv(
+            conn=conn,
+            output_path="output/jobs_clean.csv",
+        )
+
+        report_result = generate_reports(
+            conn=conn,
+            output_dir="output",
+        )
+
         logger.info("Raw jobs extracted: %d", len(raw_jobs))
         logger.info("Cleaned jobs generated: %d", len(cleaned_jobs))
         logger.info(
@@ -167,6 +180,13 @@ def main() -> None:
             load_stats["rows_failed"],
             duration_secs,
         )
+        logger.info("CSV export completed rows=%d", exported_rows)
+        logger.info(
+            "Reports generated jobs_count=%d csv=%s html=%s",
+            report_result["jobs_count"],
+            report_result["csv_path"],
+            report_result["html_path"],
+        )
 
         print("Pipeline run completed")
         print(f"Extracted: {len(raw_jobs)}")
@@ -176,7 +196,11 @@ def main() -> None:
         print(f"Loaded: {load_stats['rows_loaded']}")
         print(f"Skipped duplicates: {load_stats['rows_skipped']}")
         print(f"Failed: {load_stats['rows_failed']}")
+        print(f"Exported CSV rows: {exported_rows}")
+        print(f"Report CSV: {report_result['csv_path']}")
+        print(f"Report HTML: {report_result['html_path']}")
         print(f"Duration seconds: {duration_secs:.2f}")
+
         print()
         print("Sample validated record:")
 
