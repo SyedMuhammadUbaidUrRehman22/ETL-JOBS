@@ -1,10 +1,11 @@
 database:
-  path: jobs.db
+  path: "jobs.db"
 
 scraping:
-  delay_seconds: 2
+  delay_seconds: 1.0
   max_retries: 3
-  backoff_factor: 2
+  backoff_factor: 2.0
+  timeout_seconds: 20.0
   max_pages: 1
 
 filters:
@@ -12,26 +13,30 @@ filters:
   location: "remote"
 
 sources:
-  remoteok:
-    enabled: true
-    type: "html"
-    base_url: "https://remoteok.com/remote-data-analyst-jobs"
-
   remotive:
     enabled: true
     type: "api"
     base_url: "https://remotive.com/api/remote-jobs"
 
+  remoteok:
+    enabled: false
+    type: "html"
+    base_url: "https://remoteok.com/remote-data-analyst-jobs"
+
   weworkremotely:
-    enabled: true
+    enabled: false
     type: "html"
     base_url: "https://weworkremotely.com/remote-jobs/search"
 
   hn_hiring:
-    enabled: true
+    enabled: false
     type: "html"
     base_url: "https://news.ycombinator.com/"
 
 output:
   clean_csv: "output/jobs_clean.csv"
-  logs: "logs/pipeline.log"
+  report_dir: "output"
+
+logging:
+  log_dir: "logs"
+  log_file: "logs/pipeline.log"

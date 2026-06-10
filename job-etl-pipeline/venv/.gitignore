@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+logs/
+*.log
+.DS_Store
+
+# Keep generated data optional
+# If you want portfolio demo data, commit output/jobs_clean.csv
+# Do not commit huge DB files.
+jobs.db
+jobs.db-shm
+jobs.db-wal

@@ -176,3 +176,107 @@ pandas.errors.InvalidIndexError: Reindexing only valid with uniquely valued Inde
 2026-06-10 20:06:28,615 | INFO     | __main__ | CSV export completed rows=29
 2026-06-10 20:06:28,616 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
 2026-06-10 20:06:28,619 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:10:45,811 | INFO     | __main__ | Pipeline started
+2026-06-10 20:10:45,816 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:10:45,816 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:10:45,817 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+analyst
+2026-06-10 20:10:47,796 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:10:47,799 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:10:47,918 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:10:47,937 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:10:47,942 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:10:47,942 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:10:47,943 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:10:47,943 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:10:47,943 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.10s
+2026-06-10 20:10:47,943 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:10:47,943 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:10:47,947 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:13:08,028 | INFO     | __main__ | Pipeline started
+2026-06-10 20:13:08,031 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:13:08,031 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:13:08,032 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+analyst
+2026-06-10 20:13:10,039 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:13:10,042 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:13:10,159 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:13:10,181 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:13:10,187 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:13:10,187 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:13:10,187 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:13:10,188 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:13:10,188 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.12s
+2026-06-10 20:13:10,188 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:13:10,188 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:13:10,192 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:13:19,452 | INFO     | __main__ | Pipeline started
+2026-06-10 20:13:19,456 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:13:19,456 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:13:19,456 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+analyst
+2026-06-10 20:13:21,464 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:13:21,466 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:13:21,607 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:13:21,641 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:13:21,649 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:13:21,650 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:13:21,650 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:13:21,650 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:13:21,650 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.14s
+2026-06-10 20:13:21,650 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:13:21,651 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:13:21,655 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:13:32,223 | INFO     | __main__ | Pipeline started
+2026-06-10 20:13:32,226 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:13:32,226 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:13:32,227 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+engineer
+2026-06-10 20:13:34,209 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:13:34,211 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:13:34,328 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:13:34,346 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:13:34,352 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:13:34,352 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:13:34,352 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:13:34,353 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:13:34,353 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.10s
+2026-06-10 20:13:34,353 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:13:34,353 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:13:34,356 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:13:47,266 | INFO     | __main__ | Pipeline started
+2026-06-10 20:13:47,269 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:13:47,295 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:13:47,301 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:13:47,307 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:13:47,308 | INFO     | __main__ | Report-only run completed jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:13:57,098 | INFO     | __main__ | Pipeline started
+2026-06-10 20:13:57,099 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:13:57,100 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:13:57,100 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+analyst
+2026-06-10 20:13:57,102 | DEBUG    | urllib3.connectionpool | Starting new HTTPS connection (1): remotive.com:443
+2026-06-10 20:13:57,970 | DEBUG    | urllib3.connectionpool | https://remotive.com:443 "GET /api/remote-jobs?search=data+analyst HTTP/1.1" 200 None
+2026-06-10 20:13:59,022 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:13:59,023 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:13:59,169 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:13:59,196 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:13:59,207 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:13:59,207 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:13:59,208 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:13:59,208 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:13:59,208 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.06s
+2026-06-10 20:13:59,208 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:13:59,208 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:13:59,213 | INFO     | __main__ | Pipeline finished successfully
+2026-06-10 20:14:03,777 | INFO     | __main__ | Pipeline started
+2026-06-10 20:14:03,780 | INFO     | __main__ | Database initialised successfully
+2026-06-10 20:14:03,780 | INFO     | __main__ | Running source=remotive
+2026-06-10 20:14:03,781 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data+analyst
+2026-06-10 20:14:05,797 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=28
+2026-06-10 20:14:05,799 | INFO     | __main__ | Source completed source=remotive rows_extracted=28
+2026-06-10 20:14:05,919 | INFO     | etl.load.exporter | Exported jobs CSV rows=29 path=output\jobs_clean.csv
+2026-06-10 20:14:05,939 | INFO     | reports.generator | Exported report CSV path=output\report_20260610.csv rows=46
+2026-06-10 20:14:05,947 | INFO     | reports.generator | Exported report HTML path=output\report_20260610.html
+2026-06-10 20:14:05,947 | INFO     | __main__ | Raw jobs extracted: 28
+2026-06-10 20:14:05,947 | INFO     | __main__ | Cleaned jobs generated: 28
+2026-06-10 20:14:05,947 | INFO     | __main__ | Validated jobs: active=28 incomplete=0
+2026-06-10 20:14:05,947 | INFO     | __main__ | Load stats: loaded=0 skipped=28 failed=0 duration=2.13s
+2026-06-10 20:14:05,948 | INFO     | __main__ | CSV export completed rows=29
+2026-06-10 20:14:05,948 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
+2026-06-10 20:14:05,951 | INFO     | __main__ | Pipeline finished successfully
