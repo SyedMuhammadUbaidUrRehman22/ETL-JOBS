@@ -1,0 +1,6 @@
+requests
+beautifulsoup4
+pandas
+PyYAML
+python-dateutil
+pytest

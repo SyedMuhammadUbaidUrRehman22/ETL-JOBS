@@ -1,0 +1,37 @@
+database:
+  path: jobs.db
+
+scraping:
+  delay_seconds: 2
+  max_retries: 3
+  backoff_factor: 2
+  max_pages: 1
+
+filters:
+  keyword: "data analyst"
+  location: "remote"
+
+sources:
+  remoteok:
+    enabled: true
+    type: "html"
+    base_url: "https://remoteok.com/remote-data-analyst-jobs"
+
+  remotive:
+    enabled: true
+    type: "api"
+    base_url: "https://remotive.com/api/remote-jobs"
+
+  weworkremotely:
+    enabled: true
+    type: "html"
+    base_url: "https://weworkremotely.com/remote-jobs/search"
+
+  hn_hiring:
+    enabled: true
+    type: "html"
+    base_url: "https://news.ycombinator.com/"
+
+output:
+  clean_csv: "output/jobs_clean.csv"
+  logs: "logs/pipeline.log"
