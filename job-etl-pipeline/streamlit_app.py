@@ -1,14 +1,5 @@
 """
-streamlit_app.py — Modern Streamlit dashboard for Job Market ETL Pipeline.
-
-UI style:
-- Dark hero section
-- Navigation/filter chips
-- KPI cards
-- Tabbed dashboard layout
-- Clean job explorer
-- Salary analysis
-- Pipeline health checks
+streamlit_app.py — Improved Streamlit dashboard for Job Market ETL Pipeline.
 """
 
 from __future__ import annotations
@@ -18,10 +9,9 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+
 APP_DIR = Path(__file__).resolve().parent
-
 DB_PATH = APP_DIR / "jobs.db"
-
 CSV_FALLBACK_PATHS = [
     APP_DIR / "output" / "jobs_clean.csv",
     APP_DIR / "jobs_clean.csv",
@@ -29,244 +19,276 @@ CSV_FALLBACK_PATHS = [
     Path("jobs_clean.csv"),
 ]
 
-
 st.set_page_config(
-    page_title="Job Market ETL Dashboard",
-    page_icon="📊",
+    page_title="JobOS — Job Market Intelligence",
+    page_icon="◌",
     layout="wide",
 )
 
 
 # ---------------------------------------------------------------------
-# Custom CSS
+# CSS
 # ---------------------------------------------------------------------
 
 def inject_css() -> None:
     st.markdown(
         """
         <style>
-        /* App background */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+        }
+
         .stApp {
-            background: #f1f1f1;
-            color: #111827;
+            background: #F7F7F5;
         }
 
-        /* Main container */
         .block-container {
-            padding-top: 1.5rem;
+            padding-top: 0 !important;
             padding-bottom: 3rem;
-            max-width: 1450px;
+            max-width: 1440px;
         }
 
-        /* Hide Streamlit chrome */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
+        #MainMenu, footer, header { visibility: hidden; }
 
-        /* General text safety */
-        h1, h2, h3, h4, h5, h6, p, span, label {
-            color: inherit;
-        }
-
-        /* Hero section */
+        /* ── Hero ─────────────────────────────────────────── */
         .hero {
-            position: relative;
-            border-radius: 0px;
-            padding: 48px 56px;
-            min-height: 260px;
-            background:
-                linear-gradient(
-                    rgba(10, 16, 24, 0.80),
-                    rgba(10, 16, 24, 0.80)
-                ),
-                url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80");
-            background-size: cover;
-            background-position: center;
-            color: white;
-            margin-bottom: 36px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            background: #0F1117;
+            padding: 40px 48px 44px;
+            margin-bottom: 0;
+            border-bottom: 1px solid #1e2130;
         }
 
-        .hero-top {
-            display: flex;
-            justify-content: space-between;
+        .hero-eyebrow {
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 56px;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #6EE7B7;
+            margin-bottom: 20px;
         }
 
-        .brand {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            color: #ffffff;
+        .hero-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #6EE7B7;
+            display: inline-block;
+            animation: pulse 2s infinite;
         }
 
-        .hero-button {
-            border: 1px solid rgba(255,255,255,0.75);
-            padding: 12px 26px;
-            font-size: 14px;
-            font-weight: 700;
-            background: rgba(255,255,255,0.96);
-            color: #111827;
-            border-radius: 2px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
         .hero-title {
-            max-width: 840px;
-            font-size: 52px;
-            line-height: 1.02;
+            font-size: 44px;
             font-weight: 800;
-            letter-spacing: -2.5px;
-            margin-bottom: 16px;
-            color: #ffffff;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            color: #FFFFFF;
+            margin-bottom: 14px;
+            max-width: 700px;
         }
 
-        .hero-subtitle {
-            max-width: 760px;
-            color: rgba(255,255,255,0.82);
-            font-size: 17px;
-            line-height: 1.55;
+        .hero-title span {
+            color: #6EE7B7;
         }
 
-        /* Chips */
-        .chip-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 26px;
-        }
-
-        .chip {
-            display: inline-block;
-            padding: 10px 17px;
-            background: #ffffff;
-            color: #333333;
-            border-radius: 3px;
+        .hero-sub {
             font-size: 15px;
-            border: 1px solid #e7e7e7;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            line-height: 1.6;
+            color: #8B8FA8;
+            max-width: 560px;
+            margin-bottom: 32px;
         }
 
-        .chip-active {
-            background: #111827;
-            color: #ffffff;
-            border-color: #111827;
+        .hero-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        /* KPI cards */
-        .kpi-card {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            padding: 24px 24px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-            min-height: 128px;
-            margin-bottom: 10px;
+        .hero-tag {
+            padding: 6px 14px;
+            border: 1px solid #2a2e42;
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8B8FA8;
+            letter-spacing: 0.4px;
+            background: #181C2A;
+        }
+
+        /* ── Stat bar ─────────────────────────────────────── */
+        .stat-bar {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E8E8E4;
+            padding: 0 48px;
+            display: flex;
+            gap: 0;
+        }
+
+        .stat-item {
+            padding: 20px 32px 20px 0;
+            margin-right: 32px;
+            border-right: 1px solid #E8E8E4;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-num {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #0F1117;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #9CA3AF;
+        }
+
+        .stat-accent { color: #059669; }
+
+        /* ── Content area ─────────────────────────────────── */
+        .content-wrap {
+            padding: 28px 48px 0;
+        }
+
+        /* ── Section headers ──────────────────────────────── */
+        .sec-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .sec-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #0F1117;
+        }
+
+        .sec-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9CA3AF;
+        }
+
+        /* ── KPI cards ────────────────────────────────────── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .kpi {
+            background: #FFFFFF;
+            border: 1px solid #E8E8E4;
+            border-radius: 4px;
+            padding: 20px 22px;
         }
 
         .kpi-label {
-            font-size: 13px;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 12px;
+            font-size: 11px;
             font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #9CA3AF;
+            margin-bottom: 10px;
         }
 
         .kpi-value {
-            font-size: 38px;
-            line-height: 1;
+            font-size: 32px;
             font-weight: 800;
-            color: #111827;
             letter-spacing: -1.5px;
+            color: #0F1117;
+            line-height: 1;
+            margin-bottom: 6px;
         }
 
         .kpi-note {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 10px;
+            font-size: 12px;
+            color: #9CA3AF;
         }
 
-        /* Section titles */
-        .section-title {
-            font-size: 25px;
-            font-weight: 800;
-            letter-spacing: -0.8px;
-            margin-bottom: 6px;
-            color: #111827;
+        .kpi-value.accent { color: #059669; }
+        .kpi-value.warn   { color: #D97706; }
+        .kpi-value.info   { color: #2563EB; }
+
+        /* ── Chart cards ──────────────────────────────────── */
+        .chart-card {
+            background: #FFFFFF;
+            border: 1px solid #E8E8E4;
+            border-radius: 4px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
         }
 
-        .section-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 18px;
+        /* ── Tabs ─────────────────────────────────────────── */
+        div[data-testid="stTabs"] {
+            margin-top: 4px;
         }
 
-        /* Tabs */
         button[data-baseweb="tab"] {
-            background: #ffffff !important;
-            border: 1px solid #dcdcdc !important;
-            padding: 12px 22px !important;
-            margin-right: 10px !important;
-            border-radius: 3px 3px 0 0 !important;
-            font-weight: 700 !important;
-            color: #111827 !important;
-            min-width: 150px;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            padding: 12px 18px !important;
+            margin-right: 4px !important;
+            border-radius: 0 !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            color: #9CA3AF !important;
         }
 
         button[data-baseweb="tab"] p {
-            color: #111827 !important;
-            font-weight: 700 !important;
-            font-size: 15px !important;
+            color: inherit !important;
+            font-weight: inherit !important;
+            font-size: inherit !important;
         }
 
         button[data-baseweb="tab"][aria-selected="true"] {
-            background: #111827 !important;
-            color: #ffffff !important;
-            border-color: #111827 !important;
-            border-bottom: 3px solid #ef4444 !important;
+            background: transparent !important;
+            color: #0F1117 !important;
+            border-bottom: 2px solid #059669 !important;
         }
 
         button[data-baseweb="tab"][aria-selected="true"] p {
-            color: #ffffff !important;
+            color: #0F1117 !important;
         }
 
-        div[data-testid="stTabs"] {
-            margin-top: 20px;
+        div[role="tabpanel"] {
+            padding-top: 24px;
         }
 
-        /* Streamlit metric cards fallback */
-        div[data-testid="stMetric"] {
-            background: #ffffff !important;
-            padding: 22px 24px !important;
-            border-radius: 5px !important;
-            border: 1px solid #e0e0e0 !important;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.04) !important;
-        }
-
-        div[data-testid="stMetric"] label,
-        div[data-testid="stMetric"] label p {
-            color: #6b7280 !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-        }
-
-        div[data-testid="stMetric"] div[data-testid="stMetricValue"],
-        div[data-testid="stMetric"] div[data-testid="stMetricValue"] div {
-            color: #111827 !important;
-            font-size: 36px !important;
-            font-weight: 800 !important;
-        }
-
-        /* Tables */
+        /* ── Table ────────────────────────────────────────── */
         div[data-testid="stDataFrame"] {
-            border-radius: 5px;
+            border-radius: 4px;
             overflow: hidden;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #E8E8E4;
         }
 
-        /* Sidebar */
+        /* ── Sidebar ──────────────────────────────────────── */
         section[data-testid="stSidebar"] {
-            background: #111827;
+            background: #0F1117;
+            border-right: 1px solid #1e2130;
+        }
+
+        section[data-testid="stSidebar"] > div {
+            padding-top: 2rem;
         }
 
         section[data-testid="stSidebar"] h1,
@@ -275,37 +297,66 @@ def inject_css() -> None:
         section[data-testid="stSidebar"] p,
         section[data-testid="stSidebar"] label,
         section[data-testid="stSidebar"] span {
-            color: #ffffff !important;
+            color: #F9FAFB !important;
         }
 
-        section[data-testid="stSidebar"] input {
-            color: #111827 !important;
-            background: #ffffff !important;
+        section[data-testid="stSidebar"] .stCaption {
+            color: #6B7280 !important;
+        }
+
+        section[data-testid="stSidebar"] input,
+        section[data-testid="stSidebar"] div[data-baseweb="select"] {
+            background: #181C2A !important;
+            border-color: #2a2e42 !important;
+            color: #F9FAFB !important;
         }
 
         section[data-testid="stSidebar"] div[data-baseweb="select"] span {
-            color: #111827 !important;
+            color: #F9FAFB !important;
         }
 
-        /* Download button */
+        /* ── Download button ──────────────────────────────── */
         .stDownloadButton button {
-            background: #111827;
-            color: #ffffff;
-            border-radius: 3px;
-            border: none;
-            padding: 10px 18px;
-            font-weight: 700;
+            background: #0F1117 !important;
+            color: #FFFFFF !important;
+            border-radius: 3px !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            letter-spacing: 0.3px;
         }
 
         .stDownloadButton button:hover {
-            background: #374151;
-            color: #ffffff;
+            background: #1e2130 !important;
         }
 
-        hr {
-            margin-top: 32px;
-            margin-bottom: 32px;
+        /* ── Health indicator ─────────────────────────────── */
+        .health-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #F3F4F6;
+            font-size: 14px;
         }
+
+        .health-row:last-child { border-bottom: none; }
+
+        .health-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-green { background: #10B981; }
+        .dot-amber { background: #F59E0B; }
+        .dot-red   { background: #EF4444; }
+
+        .health-field { color: #374151; font-weight: 600; }
+        .health-val   { margin-left: auto; color: #6B7280; font-size: 13px; }
+
+        hr { margin: 28px 0; border-color: #E8E8E4; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -318,107 +369,74 @@ def inject_css() -> None:
 
 @st.cache_data(show_spinner=False)
 def load_jobs_from_sqlite(db_path: str) -> pd.DataFrame:
-    """
-    Load jobs from SQLite database.
-    """
     query = """
-        SELECT
-            id,
-            title,
-            seniority_level,
-            company,
-            city,
-            region,
-            remote_flag,
-            salary_min,
-            salary_max,
-            salary_currency,
-            date_posted,
-            source,
-            url,
-            description,
-            status,
-            first_seen,
-            last_seen
+        SELECT id, title, seniority_level, company, city, region, remote_flag,
+               salary_min, salary_max, salary_currency, date_posted, source,
+               url, description, status, first_seen, last_seen
         FROM jobs
         WHERE status IN ('active', 'incomplete')
         ORDER BY last_seen DESC, id DESC;
     """
-
     with sqlite3.connect(db_path) as conn:
         df = pd.read_sql_query(query, conn)
-
     return prepare_dataframe(df)
 
 
 @st.cache_data(show_spinner=False)
 def load_jobs_from_csv(csv_path: str) -> pd.DataFrame:
-    """
-    Load jobs from CSV fallback.
-    """
-    df = pd.read_csv(csv_path)
-    return prepare_dataframe(df)
+    return prepare_dataframe(pd.read_csv(csv_path))
 
 
 def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Prepare data types for dashboarding.
-    """
     if df.empty:
         return df
-
     for col in ["date_posted", "first_seen", "last_seen"]:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
-
     if "remote_flag" in df.columns:
         df["remote_flag"] = df["remote_flag"].astype(bool)
-
     if "salary_min" in df.columns:
         df["salary_min"] = pd.to_numeric(df["salary_min"], errors="coerce")
-
     if "salary_max" in df.columns:
         df["salary_max"] = pd.to_numeric(df["salary_max"], errors="coerce")
-
     if "salary_min" in df.columns and "salary_max" in df.columns:
         df["salary_midpoint"] = (df["salary_min"] + df["salary_max"]) / 2
-
     return df
 
-def load_data() -> pd.DataFrame:
-    """
-    Load data from SQLite first, then CSV fallback paths.
 
-    Uses APP_DIR so Streamlit Cloud can find files even when the app
-    is deployed from a subfolder.
-    """
+def load_data() -> pd.DataFrame:
     if DB_PATH.exists():
         return load_jobs_from_sqlite(str(DB_PATH))
-
     for csv_path in CSV_FALLBACK_PATHS:
         if csv_path.exists():
             return load_jobs_from_csv(str(csv_path))
-
     return pd.DataFrame()
+
+
 # ---------------------------------------------------------------------
-# UI Components
+# Components
 # ---------------------------------------------------------------------
 
-def render_hero() -> None:
+def render_hero(df: pd.DataFrame) -> None:
+    source_count = df["source"].nunique() if "source" in df.columns else 0
     st.markdown(
-        """
+        f"""
         <div class="hero">
-            <div class="hero-top">
-                <div class="brand">◌ JobOS</div>
-                <div class="hero-button">ETL Portfolio Project</div>
+            <div class="hero-eyebrow">
+                <span class="hero-dot"></span>
+                Live Pipeline
             </div>
-            <div class="hero-title">
-                Automated Job Market Intelligence Pipeline
+            <div class="hero-title">Job Market<br><span>Intelligence</span></div>
+            <div class="hero-sub">
+                Full ETL workflow: scraping, cleaning, deduplication, SQLite storage,
+                and analytics — built as a portfolio-grade data engineering project.
             </div>
-            <div class="hero-subtitle">
-                A full ETL workflow for scraping job postings, cleaning messy fields,
-                deduplicating listings, storing records in SQLite, and generating
-                analytical reports.
+            <div class="hero-tags">
+                <span class="hero-tag">SQLite</span>
+                <span class="hero-tag">Pandas</span>
+                <span class="hero-tag">Deduplication</span>
+                <span class="hero-tag">{source_count} Source{'s' if source_count != 1 else ''}</span>
+                <span class="hero-tag">ETL Pipeline</span>
             </div>
         </div>
         """,
@@ -426,21 +444,36 @@ def render_hero() -> None:
     )
 
 
-def render_chips(df: pd.DataFrame) -> None:
-    source_count = df["source"].nunique() if "source" in df.columns else 0
-    company_count = df["company"].nunique() if "company" in df.columns else 0
-    remote_count = int(df["remote_flag"].sum()) if "remote_flag" in df.columns else 0
+def render_stat_bar(df: pd.DataFrame) -> None:
+    total = len(df)
+    active = int((df["status"] == "active").sum()) if "status" in df.columns else 0
+    remote = int(df["remote_flag"].sum()) if "remote_flag" in df.columns else 0
+    companies = df["company"].nunique() if "company" in df.columns else 0
+    rate = f"{active / total * 100:.0f}%" if total > 0 else "—"
 
     st.markdown(
         f"""
-        <div class="chip-row">
-            <span class="chip chip-active">Overview</span>
-            <span class="chip">Sources: {source_count}</span>
-            <span class="chip">Companies: {company_count}</span>
-            <span class="chip">Remote Jobs: {remote_count}</span>
-            <span class="chip">SQLite</span>
-            <span class="chip">Pandas Reports</span>
-            <span class="chip">Deduplication</span>
+        <div class="stat-bar">
+            <div class="stat-item">
+                <div class="stat-num">{total:,}</div>
+                <div class="stat-label">Total records</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num accent">{active:,}</div>
+                <div class="stat-label">Active listings</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{remote:,}</div>
+                <div class="stat-label">Remote roles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{companies:,}</div>
+                <div class="stat-label">Companies</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">{rate}</div>
+                <div class="stat-label">Completeness</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -448,196 +481,167 @@ def render_chips(df: pd.DataFrame) -> None:
 
 
 def render_sidebar_filters(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Sidebar filters for source, status, seniority, and search keyword.
-    """
-    st.sidebar.title("Filters")
-    st.sidebar.caption("Refine the extracted job dataset.")
+    st.sidebar.markdown("## ◌ JobOS")
+    st.sidebar.caption("Filter the extracted dataset.")
+    st.sidebar.divider()
 
     filtered = df.copy()
 
     if "source" in filtered.columns:
         sources = sorted(filtered["source"].dropna().unique().tolist())
-        selected_sources = st.sidebar.multiselect(
-            "Source",
-            options=sources,
-            default=sources,
-        )
-        filtered = filtered[filtered["source"].isin(selected_sources)]
+        sel = st.sidebar.multiselect("Source", options=sources, default=sources)
+        filtered = filtered[filtered["source"].isin(sel)]
 
     if "status" in filtered.columns:
         statuses = sorted(filtered["status"].dropna().unique().tolist())
-        selected_statuses = st.sidebar.multiselect(
-            "Status",
-            options=statuses,
-            default=statuses,
-        )
-        filtered = filtered[filtered["status"].isin(selected_statuses)]
+        sel = st.sidebar.multiselect("Status", options=statuses, default=statuses)
+        filtered = filtered[filtered["status"].isin(sel)]
 
     if "seniority_level" in filtered.columns:
         seniorities = sorted(filtered["seniority_level"].dropna().unique().tolist())
-        selected_seniorities = st.sidebar.multiselect(
-            "Seniority",
-            options=seniorities,
-            default=seniorities,
-        )
+        sel = st.sidebar.multiselect("Seniority", options=seniorities, default=seniorities)
+        if sel:
+            filtered = filtered[filtered["seniority_level"].isin(sel)]
 
-        if selected_seniorities:
-            filtered = filtered[filtered["seniority_level"].isin(selected_seniorities)]
-
-    search_text = st.sidebar.text_input("Search title/company")
-
-    if search_text:
-        search_lower = search_text.lower()
+    query = st.sidebar.text_input("Search title / company")
+    if query:
+        q = query.lower()
         filtered = filtered[
-            filtered["title"].fillna("").str.lower().str.contains(search_lower)
-            | filtered["company"].fillna("").str.lower().str.contains(search_lower)
+            filtered["title"].fillna("").str.lower().str.contains(q)
+            | filtered["company"].fillna("").str.lower().str.contains(q)
         ]
+
+    st.sidebar.divider()
+    st.sidebar.caption(f"{len(filtered):,} of {len(df):,} records shown")
 
     return filtered
 
 
-def render_kpi_cards(cards: list[tuple[str, object, str]]) -> None:
+def kpi_card(label: str, value: object, note: str, color: str = "") -> str:
+    cls = f"kpi-value {color}" if color else "kpi-value"
+    return f"""
+    <div class="kpi">
+        <div class="kpi-label">{label}</div>
+        <div class="{cls}">{value}</div>
+        <div class="kpi-note">{note}</div>
+    </div>
     """
-    Render reusable KPI cards.
-    """
-    columns = st.columns(len(cards))
-
-    for col, (label, value, note) in zip(columns, cards):
-        with col:
-            st.markdown(
-                f"""
-                <div class="kpi-card">
-                    <div class="kpi-label">{label}</div>
-                    <div class="kpi-value">{value}</div>
-                    <div class="kpi-note">{note}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
 
 
 def render_kpis(df: pd.DataFrame) -> None:
-    """
-    Render overview KPI cards.
-    """
-    total_jobs = len(df)
-    active_jobs = int((df["status"] == "active").sum()) if "status" in df else 0
-    incomplete_jobs = int((df["status"] == "incomplete").sum()) if "status" in df else 0
-    remote_jobs = int(df["remote_flag"].sum()) if "remote_flag" in df else 0
+    total = len(df)
+    active = int((df["status"] == "active").sum()) if "status" in df.columns else 0
+    incomplete = int((df["status"] == "incomplete").sum()) if "status" in df.columns else 0
+    remote = int(df["remote_flag"].sum()) if "remote_flag" in df.columns else 0
 
-    cards = [
-        ("Total Jobs", total_jobs, "Records available after cleaning"),
-        ("Active Jobs", active_jobs, "Valid records ready for analysis"),
-        ("Incomplete", incomplete_jobs, "Missing critical fields"),
-        ("Remote Jobs", remote_jobs, "Remote-friendly listings"),
-    ]
-
-    render_kpi_cards(cards)
+    html = (
+        '<div class="kpi-grid">'
+        + kpi_card("Total jobs", f"{total:,}", "After cleaning & dedup")
+        + kpi_card("Active", f"{active:,}", "Ready for analysis", "accent")
+        + kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields", "warn")
+        + kpi_card("Remote", f"{remote:,}", "Remote-friendly roles", "info")
+        + "</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 
-def render_chart_sections(df: pd.DataFrame) -> None:
-    """
-    Render overview chart sections.
-    """
+def section_header(title: str, subtitle: str = "") -> None:
+    sub_html = f'<span class="sec-count">{subtitle}</span>' if subtitle else ""
+    st.markdown(
+        f'<div class="sec-header"><span class="sec-title">{title}</span>{sub_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def chart_card_open() -> None:
+    st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+
+
+def chart_card_close() -> None:
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_overview_charts(df: pd.DataFrame) -> None:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown(
-            """
-            <div class="section-title">Top Job Titles</div>
-            <div class="section-subtitle">Most frequent normalized job titles.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        chart_card_open()
+        section_header("Top job titles", "top 10 by frequency")
         if not df.empty and "title" in df.columns:
-            title_counts = df["title"].fillna("Unknown").value_counts().head(10)
-            st.bar_chart(title_counts)
+            st.bar_chart(df["title"].fillna("Unknown").value_counts().head(10))
         else:
-            st.info("No title data available.")
+            st.info("No title data.")
+        chart_card_close()
 
     with col2:
-        st.markdown(
-            """
-            <div class="section-title">Top Hiring Companies</div>
-            <div class="section-subtitle">Companies with the most extracted postings.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        chart_card_open()
+        section_header("Top hiring companies", "top 10 by postings")
         if not df.empty and "company" in df.columns:
-            company_counts = df["company"].fillna("Unknown").value_counts().head(10)
-            st.bar_chart(company_counts)
+            st.bar_chart(df["company"].fillna("Unknown").value_counts().head(10))
         else:
-            st.info("No company data available.")
-
-    st.divider()
+            st.info("No company data.")
+        chart_card_close()
 
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown(
-            """
-            <div class="section-title">Remote Breakdown</div>
-            <div class="section-subtitle">Remote versus on-site or unspecified roles.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        chart_card_open()
+        section_header("Remote vs on-site")
         if not df.empty and "remote_flag" in df.columns:
-            remote_counts = (
+            counts = (
                 df["remote_flag"]
                 .map({True: "Remote", False: "On-site / Unspecified"})
                 .value_counts()
             )
-            st.bar_chart(remote_counts)
+            st.bar_chart(counts)
         else:
-            st.info("No remote data available.")
+            st.info("No remote data.")
+        chart_card_close()
 
     with col4:
-        st.markdown(
-            """
-            <div class="section-title">New Jobs Over Time</div>
-            <div class="section-subtitle">Listings by first-seen pipeline date.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        chart_card_open()
+        section_header("New listings over time", "by first-seen date")
         if not df.empty and "first_seen" in df.columns:
-            daily_counts = (
+            daily = (
                 df.dropna(subset=["first_seen"])
-                .assign(first_seen_date=lambda x: x["first_seen"].dt.date)
-                .groupby("first_seen_date")
+                .assign(d=lambda x: x["first_seen"].dt.date)
+                .groupby("d")
                 .size()
             )
-            st.line_chart(daily_counts)
+            st.line_chart(daily)
         else:
-            st.info("No date data available.")
+            st.info("No date data.")
+        chart_card_close()
+
+
+def render_jobs_table(df: pd.DataFrame) -> None:
+    section_header("Clean job records", f"{len(df):,} results")
+
+    display_cols = [
+        "title", "company", "seniority_level", "region", "remote_flag",
+        "salary_min", "salary_max", "salary_currency", "date_posted", "source", "status", "url",
+    ]
+    available = [c for c in display_cols if c in df.columns]
+    st.dataframe(df[available], use_container_width=True, hide_index=True)
+
+    st.download_button(
+        label="Download filtered CSV",
+        data=df.to_csv(index=False).encode("utf-8"),
+        file_name="filtered_jobs.csv",
+        mime="text/csv",
+    )
 
 
 def render_salary_section(df: pd.DataFrame) -> None:
-    """
-    Render salary summary table.
-    """
-    st.markdown(
-        """
-        <div class="section-title">Salary Summary</div>
-        <div class="section-subtitle">
-            Salary distribution by role where salary fields are available.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    section_header("Salary breakdown", "by role where data available")
 
     if df.empty or "salary_midpoint" not in df.columns:
         st.info("No salary data available.")
         return
 
     salary_df = df.dropna(subset=["salary_midpoint"]).copy()
-
     if salary_df.empty:
-        st.info("Salary data not available in current records.")
+        st.info("No salary data in current records.")
         return
 
     summary = (
@@ -655,174 +659,83 @@ def render_salary_section(df: pd.DataFrame) -> None:
     st.dataframe(summary, use_container_width=True, hide_index=True)
 
 
-def render_jobs_table(df: pd.DataFrame) -> None:
+def health_row(label: str, value: str, status: str) -> str:
+    dot_cls = {"green": "dot-green", "amber": "dot-amber", "red": "dot-red"}.get(status, "dot-green")
+    return f"""
+    <div class="health-row">
+        <span class="health-dot {dot_cls}"></span>
+        <span class="health-field">{label}</span>
+        <span class="health-val">{value}</span>
+    </div>
     """
-    Render clean job records table.
-    """
-    st.markdown(
-        """
-        <div class="section-title">Clean Job Records</div>
-        <div class="section-subtitle">
-            Final cleaned and deduplicated records available for export.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    display_columns = [
-        "title",
-        "company",
-        "seniority_level",
-        "region",
-        "remote_flag",
-        "salary_min",
-        "salary_max",
-        "salary_currency",
-        "date_posted",
-        "source",
-        "status",
-        "url",
-    ]
-
-    available_columns = [col for col in display_columns if col in df.columns]
-
-    st.dataframe(
-        df[available_columns],
-        use_container_width=True,
-        hide_index=True,
-    )
-
-    csv_bytes = df.to_csv(index=False).encode("utf-8")
-
-    st.download_button(
-        label="Download Filtered CSV",
-        data=csv_bytes,
-        file_name="filtered_jobs.csv",
-        mime="text/csv",
-    )
 
 
 def render_pipeline_health(df: pd.DataFrame) -> None:
-    """
-    Render pipeline quality and operational health indicators.
-    """
-    st.markdown(
-        """
-        <div class="section-title">Pipeline Health</div>
-        <div class="section-subtitle">
-            Data quality, completeness, and source-level distribution.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    section_header("Pipeline health")
 
-    total_records = len(df)
-
-    if total_records == 0:
-        st.info("No records available for pipeline health checks.")
+    total = len(df)
+    if total == 0:
+        st.info("No records available.")
         return
 
-    missing_title = int(df["title"].isna().sum()) if "title" in df.columns else 0
-    missing_company = int(df["company"].isna().sum()) if "company" in df.columns else 0
-    missing_url = int(df["url"].isna().sum()) if "url" in df.columns else 0
+    incomplete = int((df["status"] == "incomplete").sum()) if "status" in df.columns else 0
+    completeness = (total - incomplete) / total * 100 if total else 0
 
-    incomplete_records = (
-        int((df["status"] == "incomplete").sum())
-        if "status" in df.columns
-        else 0
-    )
-
-    completeness_rate = (
-        ((total_records - incomplete_records) / total_records) * 100
-        if total_records
-        else 0
-    )
-
+    # KPI row
     source_count = df["source"].nunique() if "source" in df.columns else 0
-
-    cards = [
-        ("Total Records", total_records, "Rows currently available"),
-        ("Incomplete Records", incomplete_records, "Missing critical fields"),
-        ("Completeness Rate", f"{completeness_rate:.1f}%", "Valid record percentage"),
-        ("Sources", source_count, "Active data sources"),
-    ]
-
-    render_kpi_cards(cards)
+    html = (
+        '<div class="kpi-grid">'
+        + kpi_card("Total records", f"{total:,}", "In current pipeline run")
+        + kpi_card("Completeness", f"{completeness:.1f}%", "Valid record rate", "accent" if completeness > 80 else "warn")
+        + kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields", "warn" if incomplete else "")
+        + kpi_card("Sources", f"{source_count}", "Active data sources")
+        + "</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
     st.divider()
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown(
-            """
-            <div class="section-title">Missing Critical Fields</div>
-            <div class="section-subtitle">
-                Records missing title, company, or URL.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        chart_card_open()
+        section_header("Field completeness")
 
-        missing_df = pd.DataFrame(
-            {
-                "field": ["title", "company", "url"],
-                "missing_count": [missing_title, missing_company, missing_url],
-            }
-        )
+        missing_title = int(df["title"].isna().sum()) if "title" in df.columns else 0
+        missing_company = int(df["company"].isna().sum()) if "company" in df.columns else 0
+        missing_url = int(df["url"].isna().sum()) if "url" in df.columns else 0
 
-        st.dataframe(missing_df, use_container_width=True, hide_index=True)
+        def dot_status(missing: int) -> str:
+            if missing == 0:
+                return "green"
+            elif missing / total < 0.1:
+                return "amber"
+            return "red"
+
+        rows = (
+            health_row("Title", f"{missing_title:,} missing", dot_status(missing_title))
+            + health_row("Company", f"{missing_company:,} missing", dot_status(missing_company))
+            + health_row("URL", f"{missing_url:,} missing", dot_status(missing_url))
+        )
+        st.markdown(rows, unsafe_allow_html=True)
+        chart_card_close()
 
     with col2:
-        st.markdown(
-            """
-            <div class="section-title">Source Distribution</div>
-            <div class="section-subtitle">
-                Number of records extracted per source.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        chart_card_open()
+        section_header("Records per source")
         if "source" in df.columns:
-            source_counts = df["source"].fillna("Unknown").value_counts()
-            st.bar_chart(source_counts)
+            st.bar_chart(df["source"].fillna("Unknown").value_counts())
         else:
-            st.info("No source information available.")
+            st.info("No source data.")
+        chart_card_close()
 
     st.divider()
+    section_header("Recent records", "last 20 by pipeline date")
 
-    st.markdown(
-        """
-        <div class="section-title">Recent Records</div>
-        <div class="section-subtitle">
-            Most recently seen records in the pipeline.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    recent_columns = [
-        "title",
-        "company",
-        "source",
-        "status",
-        "first_seen",
-        "last_seen",
-    ]
-
-    available_columns = [col for col in recent_columns if col in df.columns]
-
-    if "last_seen" in df.columns:
-        recent_df = df.sort_values("last_seen", ascending=False).head(20)
-    else:
-        recent_df = df.head(20)
-
-    st.dataframe(
-        recent_df[available_columns],
-        use_container_width=True,
-        hide_index=True,
-    )
+    recent_cols = ["title", "company", "source", "status", "first_seen", "last_seen"]
+    available = [c for c in recent_cols if c in df.columns]
+    recent = df.sort_values("last_seen", ascending=False).head(20) if "last_seen" in df.columns else df.head(20)
+    st.dataframe(recent[available], use_container_width=True, hide_index=True)
 
 
 # ---------------------------------------------------------------------
@@ -831,36 +744,32 @@ def render_pipeline_health(df: pd.DataFrame) -> None:
 
 def main() -> None:
     inject_css()
-    render_hero()
 
     df = load_data()
+
+    filtered_df = render_sidebar_filters(df) if not df.empty else df
+
+    render_hero(filtered_df)
+    render_stat_bar(filtered_df)
+
+    st.markdown('<div class="content-wrap">', unsafe_allow_html=True)
 
     if df.empty:
         st.warning(
             "No job data found. Run `python main.py` locally first, "
             "or include `output/jobs_clean.csv` in the deployed repository."
         )
+        st.markdown("</div>", unsafe_allow_html=True)
         return
 
-    filtered_df = render_sidebar_filters(df)
-
-    render_chips(filtered_df)
-
     tab_overview, tab_jobs, tab_salary, tab_pipeline = st.tabs(
-        [
-            "Overview",
-            "Jobs Explorer",
-            "Salary Analysis",
-            "Pipeline Health",
-        ]
+        ["Overview", "Jobs explorer", "Salary analysis", "Pipeline health"]
     )
 
     with tab_overview:
+        st.markdown("<br>", unsafe_allow_html=True)
         render_kpis(filtered_df)
-
-        st.divider()
-
-        render_chart_sections(filtered_df)
+        render_overview_charts(filtered_df)
 
     with tab_jobs:
         render_jobs_table(filtered_df)
@@ -870,6 +779,8 @@ def main() -> None:
 
     with tab_pipeline:
         render_pipeline_health(filtered_df)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
