@@ -21,7 +21,10 @@ import streamlit as st
 
 
 DB_PATH = Path("jobs.db")
-CSV_FALLBACK_PATH = Path("output/jobs_clean.csv")
+CSV_FALLBACK_PATHS = [
+    Path("output/jobs_clean.csv"),
+    Path("jobs_clean.csv"),
+]
 
 
 st.set_page_config(
@@ -379,20 +382,18 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-
 def load_data() -> pd.DataFrame:
     """
-    Load data from SQLite first, then CSV fallback.
+    Load data from SQLite first, then CSV fallback paths.
     """
     if DB_PATH.exists():
         return load_jobs_from_sqlite(str(DB_PATH))
 
-    if CSV_FALLBACK_PATH.exists():
-        return load_jobs_from_csv(str(CSV_FALLBACK_PATH))
+    for csv_path in CSV_FALLBACK_PATHS:
+        if csv_path.exists():
+            return load_jobs_from_csv(str(csv_path))
 
     return pd.DataFrame()
-
-
 # ---------------------------------------------------------------------
 # UI Components
 # ---------------------------------------------------------------------
