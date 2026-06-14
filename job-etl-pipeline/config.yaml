@@ -19,19 +19,19 @@ sources:
     base_url: "https://remotive.com/api/remote-jobs"
 
   remoteok:
-    enabled: false
-    type: "html"
-    base_url: "https://remoteok.com/remote-data-analyst-jobs"
+    enabled: true
+    type: "json"
+    base_url: "https://remoteok.com/api"
 
   weworkremotely:
-    enabled: false
-    type: "html"
-    base_url: "https://weworkremotely.com/remote-jobs/search"
+    enabled: true
+    type: "rss"
+    base_url: "https://weworkremotely.com/remote-jobs.rss"
 
   hn_hiring:
-    enabled: false
-    type: "html"
-    base_url: "https://news.ycombinator.com/"
+    enabled: true
+    type: "api"
+    base_url: "https://hn.algolia.com/api/v1/search_by_date"
 
 output:
   clean_csv: "output/jobs_clean.csv"

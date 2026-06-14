@@ -280,3 +280,39 @@ pandas.errors.InvalidIndexError: Reindexing only valid with uniquely valued Inde
 2026-06-10 20:14:05,948 | INFO     | __main__ | CSV export completed rows=29
 2026-06-10 20:14:05,948 | INFO     | __main__ | Reports generated jobs_count=29 csv=output\report_20260610.csv html=output\report_20260610.html
 2026-06-10 20:14:05,951 | INFO     | __main__ | Pipeline finished successfully
+2026-06-14 13:41:26,155 | INFO     | __main__ | Pipeline started
+2026-06-14 13:41:26,169 | INFO     | __main__ | Database initialised successfully
+2026-06-14 13:41:26,170 | INFO     | __main__ | Running source=remotive
+2026-06-14 13:41:26,170 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data
+2026-06-14 13:41:28,398 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=29
+2026-06-14 13:41:28,400 | INFO     | __main__ | Source completed source=remotive rows_extracted=29
+2026-06-14 13:41:28,400 | INFO     | __main__ | Running source=remoteok
+2026-06-14 13:41:28,401 | ERROR    | __main__ | Pipeline failed
+Traceback (most recent call last):
+  File "C:\Users\Ubaid\Desktop\ETL\job-etl-pipeline\main.py", line 252, in main
+    source_jobs = run_remoteok_source(
+                  ^^^^^^^^^^^^^^^^^^^
+NameError: name 'run_remoteok_source' is not defined. Did you mean: 'run_remotive_source'?
+2026-06-14 13:42:57,889 | INFO     | __main__ | Pipeline started
+2026-06-14 13:42:57,891 | INFO     | __main__ | Database initialised successfully
+2026-06-14 13:42:57,891 | INFO     | __main__ | Running source=remotive
+2026-06-14 13:42:57,892 | INFO     | etl.extract.base_scraper | Fetching source=remotive attempt=1/3 url=https://remotive.com/api/remote-jobs?search=data
+2026-06-14 13:42:59,907 | INFO     | etl.extract.base_scraper | Parsed source=remotive page=1/1 jobs=29
+2026-06-14 13:42:59,908 | INFO     | __main__ | Source completed source=remotive rows_extracted=29
+2026-06-14 13:42:59,909 | INFO     | __main__ | Running source=remoteok
+2026-06-14 13:42:59,909 | INFO     | etl.extract.base_scraper | Fetching source=remoteok attempt=1/3 url=https://remoteok.com/api
+2026-06-14 13:43:02,061 | INFO     | etl.extract.base_scraper | Parsed source=remoteok page=1/1 jobs=100
+2026-06-14 13:43:02,065 | INFO     | __main__ | Source completed source=remoteok rows_extracted=27
+2026-06-14 13:43:02,065 | INFO     | __main__ | Running source=weworkremotely
+2026-06-14 13:43:02,066 | INFO     | etl.extract.base_scraper | Fetching source=weworkremotely attempt=1/3 url=https://weworkremotely.com/remote-jobs.rss
+2026-06-14 13:43:05,506 | INFO     | etl.extract.base_scraper | Parsed source=weworkremotely page=1/1 jobs=100
+2026-06-14 13:43:05,514 | INFO     | __main__ | Source completed source=weworkremotely rows_extracted=53
+2026-06-14 13:43:05,514 | INFO     | __main__ | Running source=hn_hiring
+2026-06-14 13:43:05,515 | INFO     | etl.extract.base_scraper | Fetching source=hn_hiring attempt=1/3 url=https://hn.algolia.com/api/v1/search_by_date?query=Ask+HN%3A+Who+is+hiring%3F&tags=story&page=0&hitsPerPage=5
+2026-06-14 13:43:08,307 | INFO     | etl.extract.base_scraper | Fetching source=hn_hiring attempt=1/3 url=https://hn.algolia.com/api/v1/items/48392632
+2026-06-14 13:43:09,685 | INFO     | etl.extract.base_scraper | Parsed source=hn_hiring page=1/1 jobs=1
+2026-06-14 13:43:09,687 | INFO     | __main__ | Source completed source=hn_hiring rows_extracted=1
+2026-06-14 13:43:10,009 | INFO     | etl.load.exporter | Exported jobs CSV rows=112 path=output\jobs_clean.csv
+2026-06-14 13:43:10,107 | INFO     | reports.generator | Exported report CSV path=output\report_20260614.csv rows=47
+2026-06-14 13:43:10,117 | INFO     | reports.generator | Exported report HTML path=output\report_20260614.html
+2026-06-14 13:43:10,118 | INFO     | __main__ | Pipeline finished successfully
