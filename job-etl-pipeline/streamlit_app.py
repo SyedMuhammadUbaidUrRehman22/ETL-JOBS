@@ -187,13 +187,6 @@ def inject_css() -> None:
         }
 
         /* ── KPI cards ────────────────────────────────────── */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-
         .kpi {
             background: #FFFFFF;
             border: 1px solid #E8E8E4;
@@ -227,15 +220,6 @@ def inject_css() -> None:
         .kpi-value.accent { color: #059669; }
         .kpi-value.warn   { color: #D97706; }
         .kpi-value.info   { color: #2563EB; }
-
-        /* ── Chart cards ──────────────────────────────────── */
-        .chart-card {
-            background: #FFFFFF;
-            border: 1px solid #E8E8E4;
-            border-radius: 4px;
-            padding: 22px 24px;
-            margin-bottom: 16px;
-        }
 
         /* ── Tabs ─────────────────────────────────────────── */
         div[data-testid="stTabs"] {
@@ -517,15 +501,19 @@ def render_sidebar_filters(df: pd.DataFrame) -> pd.DataFrame:
     return filtered
 
 
-def kpi_card(label: str, value: object, note: str, color: str = "") -> str:
-    cls = f"kpi-value {color}" if color else "kpi-value"
-    return f"""
-    <div class="kpi">
-        <div class="kpi-label">{label}</div>
-        <div class="{cls}">{value}</div>
-        <div class="kpi-note">{note}</div>
-    </div>
-    """
+def kpi_card(label: str, value: object, note: str, color: str = "") -> None:
+    """Render a single self-contained KPI card via st.markdown."""
+    value_color = {"accent": "#059669", "warn": "#D97706", "info": "#2563EB"}.get(color, "#0F1117")
+    st.markdown(
+        f"""
+        <div class="kpi">
+            <div class="kpi-label">{label}</div>
+            <div class="kpi-value" style="color:{value_color}">{value}</div>
+            <div class="kpi-note">{note}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_kpis(df: pd.DataFrame) -> None:
@@ -534,15 +522,15 @@ def render_kpis(df: pd.DataFrame) -> None:
     incomplete = int((df["status"] == "incomplete").sum()) if "status" in df.columns else 0
     remote = int(df["remote_flag"].sum()) if "remote_flag" in df.columns else 0
 
-    html = (
-        '<div class="kpi-grid">'
-        + kpi_card("Total jobs", f"{total:,}", "After cleaning & dedup")
-        + kpi_card("Active", f"{active:,}", "Ready for analysis", "accent")
-        + kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields", "warn")
-        + kpi_card("Remote", f"{remote:,}", "Remote-friendly roles", "info")
-        + "</div>"
-    )
-    st.markdown(html, unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        kpi_card("Total jobs", f"{total:,}", "After cleaning & dedup")
+    with c2:
+        kpi_card("Active", f"{active:,}", "Ready for analysis", "accent")
+    with c3:
+        kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields", "warn")
+    with c4:
+        kpi_card("Remote", f"{remote:,}", "Remote-friendly roles", "info")
 
 
 def section_header(title: str, subtitle: str = "") -> None:
@@ -553,65 +541,53 @@ def section_header(title: str, subtitle: str = "") -> None:
     )
 
 
-def chart_card_open() -> None:
-    st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-
-
-def chart_card_close() -> None:
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
 def render_overview_charts(df: pd.DataFrame) -> None:
     col1, col2 = st.columns(2)
 
     with col1:
-        chart_card_open()
-        section_header("Top job titles", "top 10 by frequency")
-        if not df.empty and "title" in df.columns:
-            st.bar_chart(df["title"].fillna("Unknown").value_counts().head(10))
-        else:
-            st.info("No title data.")
-        chart_card_close()
+        with st.container(border=True):
+            section_header("Top job titles", "top 10 by frequency")
+            if not df.empty and "title" in df.columns:
+                st.bar_chart(df["title"].fillna("Unknown").value_counts().head(10))
+            else:
+                st.info("No title data.")
 
     with col2:
-        chart_card_open()
-        section_header("Top hiring companies", "top 10 by postings")
-        if not df.empty and "company" in df.columns:
-            st.bar_chart(df["company"].fillna("Unknown").value_counts().head(10))
-        else:
-            st.info("No company data.")
-        chart_card_close()
+        with st.container(border=True):
+            section_header("Top hiring companies", "top 10 by postings")
+            if not df.empty and "company" in df.columns:
+                st.bar_chart(df["company"].fillna("Unknown").value_counts().head(10))
+            else:
+                st.info("No company data.")
 
     col3, col4 = st.columns(2)
 
     with col3:
-        chart_card_open()
-        section_header("Remote vs on-site")
-        if not df.empty and "remote_flag" in df.columns:
-            counts = (
-                df["remote_flag"]
-                .map({True: "Remote", False: "On-site / Unspecified"})
-                .value_counts()
-            )
-            st.bar_chart(counts)
-        else:
-            st.info("No remote data.")
-        chart_card_close()
+        with st.container(border=True):
+            section_header("Remote vs on-site")
+            if not df.empty and "remote_flag" in df.columns:
+                counts = (
+                    df["remote_flag"]
+                    .map({True: "Remote", False: "On-site / Unspecified"})
+                    .value_counts()
+                )
+                st.bar_chart(counts)
+            else:
+                st.info("No remote data.")
 
     with col4:
-        chart_card_open()
-        section_header("New listings over time", "by first-seen date")
-        if not df.empty and "first_seen" in df.columns:
-            daily = (
-                df.dropna(subset=["first_seen"])
-                .assign(d=lambda x: x["first_seen"].dt.date)
-                .groupby("d")
-                .size()
-            )
-            st.line_chart(daily)
-        else:
-            st.info("No date data.")
-        chart_card_close()
+        with st.container(border=True):
+            section_header("New listings over time", "by first-seen date")
+            if not df.empty and "first_seen" in df.columns:
+                daily = (
+                    df.dropna(subset=["first_seen"])
+                    .assign(d=lambda x: x["first_seen"].dt.date)
+                    .groupby("d")
+                    .size()
+                )
+                st.line_chart(daily)
+            else:
+                st.info("No date data.")
 
 
 def render_jobs_table(df: pd.DataFrame) -> None:
@@ -680,54 +656,52 @@ def render_pipeline_health(df: pd.DataFrame) -> None:
 
     incomplete = int((df["status"] == "incomplete").sum()) if "status" in df.columns else 0
     completeness = (total - incomplete) / total * 100 if total else 0
-
-    # KPI row
     source_count = df["source"].nunique() if "source" in df.columns else 0
-    html = (
-        '<div class="kpi-grid">'
-        + kpi_card("Total records", f"{total:,}", "In current pipeline run")
-        + kpi_card("Completeness", f"{completeness:.1f}%", "Valid record rate", "accent" if completeness > 80 else "warn")
-        + kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields", "warn" if incomplete else "")
-        + kpi_card("Sources", f"{source_count}", "Active data sources")
-        + "</div>"
-    )
-    st.markdown(html, unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        kpi_card("Total records", f"{total:,}", "In current pipeline run")
+    with c2:
+        kpi_card("Completeness", f"{completeness:.1f}%", "Valid record rate",
+                 "accent" if completeness > 80 else "warn")
+    with c3:
+        kpi_card("Incomplete", f"{incomplete:,}", "Missing critical fields",
+                 "warn" if incomplete else "")
+    with c4:
+        kpi_card("Sources", f"{source_count}", "Active data sources")
 
     st.divider()
 
     col1, col2 = st.columns(2)
 
+    missing_title = int(df["title"].isna().sum()) if "title" in df.columns else 0
+    missing_company = int(df["company"].isna().sum()) if "company" in df.columns else 0
+    missing_url = int(df["url"].isna().sum()) if "url" in df.columns else 0
+
+    def dot_status(missing: int) -> str:
+        if missing == 0:
+            return "green"
+        elif missing / total < 0.1:
+            return "amber"
+        return "red"
+
     with col1:
-        chart_card_open()
-        section_header("Field completeness")
-
-        missing_title = int(df["title"].isna().sum()) if "title" in df.columns else 0
-        missing_company = int(df["company"].isna().sum()) if "company" in df.columns else 0
-        missing_url = int(df["url"].isna().sum()) if "url" in df.columns else 0
-
-        def dot_status(missing: int) -> str:
-            if missing == 0:
-                return "green"
-            elif missing / total < 0.1:
-                return "amber"
-            return "red"
-
-        rows = (
-            health_row("Title", f"{missing_title:,} missing", dot_status(missing_title))
-            + health_row("Company", f"{missing_company:,} missing", dot_status(missing_company))
-            + health_row("URL", f"{missing_url:,} missing", dot_status(missing_url))
-        )
-        st.markdown(rows, unsafe_allow_html=True)
-        chart_card_close()
+        with st.container(border=True):
+            section_header("Field completeness")
+            rows = (
+                health_row("Title", f"{missing_title:,} missing", dot_status(missing_title))
+                + health_row("Company", f"{missing_company:,} missing", dot_status(missing_company))
+                + health_row("URL", f"{missing_url:,} missing", dot_status(missing_url))
+            )
+            st.markdown(rows, unsafe_allow_html=True)
 
     with col2:
-        chart_card_open()
-        section_header("Records per source")
-        if "source" in df.columns:
-            st.bar_chart(df["source"].fillna("Unknown").value_counts())
-        else:
-            st.info("No source data.")
-        chart_card_close()
+        with st.container(border=True):
+            section_header("Records per source")
+            if "source" in df.columns:
+                st.bar_chart(df["source"].fillna("Unknown").value_counts())
+            else:
+                st.info("No source data.")
 
     st.divider()
     section_header("Recent records", "last 20 by pipeline date")
