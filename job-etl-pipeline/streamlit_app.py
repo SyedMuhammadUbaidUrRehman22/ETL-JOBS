@@ -18,10 +18,13 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+APP_DIR = Path(__file__).resolve().parent
 
+DB_PATH = APP_DIR / "jobs.db"
 
-DB_PATH = Path("jobs.db")
 CSV_FALLBACK_PATHS = [
+    APP_DIR / "output" / "jobs_clean.csv",
+    APP_DIR / "jobs_clean.csv",
     Path("output/jobs_clean.csv"),
     Path("jobs_clean.csv"),
 ]
@@ -385,6 +388,9 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 def load_data() -> pd.DataFrame:
     """
     Load data from SQLite first, then CSV fallback paths.
+
+    Uses APP_DIR so Streamlit Cloud can find files even when the app
+    is deployed from a subfolder.
     """
     if DB_PATH.exists():
         return load_jobs_from_sqlite(str(DB_PATH))
